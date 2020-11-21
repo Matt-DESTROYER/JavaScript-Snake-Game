@@ -27,6 +27,7 @@ function bindKeys() {
 	document.onkeydown = function(e) {
 		e = e || window.event;
 		if (keyPause === 0) {
+			started = true;
 			switch (e.keyCode) {
 					// WASD
 				case 87:
@@ -89,8 +90,7 @@ function bindKeys() {
 					ay = 200;
 					score = 0;
 					exit = false;
-					tailX = [];
-					tailY = [];
+					tail = [[0], [0]];
 					keyPause = 0;
 					break;
 			}
@@ -104,10 +104,11 @@ function drawFrame() {
 	canvCtx.clearRect(0,0, canv.width, canv.height);
 	
 	// Render snake
-	canvCtx.fillStyle = "green";
-	canvCtx.fillRect(x, y, 25, 25);
+	canvCtx.fillStyle = "darkgreen";
+	canvCtx.fillRect(x + 1, y + 1, 24, 24);
 	for (let i = 0; i < score; i++) {
-		canvCtx.fillRect(tailX[i], tailY[i], 25, 25);
+		canvCtx.fillStyle = "green";
+		canvCtx.fillRect(tail[0][i] + 1, tail[1][i] + 1, 24, 24);
 	}
 	
 	// Render apple
@@ -116,35 +117,36 @@ function drawFrame() {
 	canvCtx.closePath;
 	canvCtx.fill;
 	
-	// Render score
-	canvCtx.fillStyle = "black";
-	canvCtx.font = "20px Arial";
-	canvCtx.fillText("Score: " + score, 10, 25);
-}
-
-// Draw "Game Over" Screen
-function drawGameOver() {
-	canvCtx.beginPath();
-	canvCtx.clearRect(0,0, canv.width, canv.height);
-	canvCtx.fillStyle = "black";
-	canvCtx.font = "20px Arial";
-	canvCtx.fillText("Game over!", canv.width / 7, canv.height - 350);
-	canvCtx.fillText("Your final score was: " + score, canv.width / 7, canv.height - 300);
-	canvCtx.fillText("Press space to play again.", canv.width / 7, canv.height - 250);
-	canvCtx.closePath;
-	canvCtx.fill;
+	// Render score or "game over" screen
+	if (exit === false) {
+		canvCtx.fillStyle = "black";
+		canvCtx.font = "20px Arial";
+		canvCtx.fillText("Score: " + score, 10, 25);
+		if (started === false) {
+			canvCtx.fillStyle = "black";
+			canvCtx.font = "20px Arial";
+			canvCtx.fillText("Use W, A, S, D or the arrow keys to steer.", canv.width / 7, canv.height - 275);
+			canvCtx.fillText("Press any key to begin.", canv.width / 7, canv.height - 250);
+		}
+	} else {
+		canvCtx.fillStyle = "black";
+		canvCtx.font = "20px Arial";
+		canvCtx.fillText("Game over!", canv.width / 7, canv.height - 300);
+		canvCtx.fillText("Your final score was: " + score, canv.width / 7, canv.height - 250);
+		canvCtx.fillText("Press space to play again.", canv.width / 7, canv.height - 200);
+	}
 }
 
 // Update positioning variables and sense if off screen
 function positioning() {
 	if (exit === false) {
 		// Tail
-		tailX[0] = x;
-		tailY[0] = y;
+		tail[0][0] = x;
+		tail[1][0] = y;
 		if (score > 0) {
 			for (let i = score; i > 0; i--) {
-				tailX[i] = tailX[i - 1];
-				tailY[i] = tailY[i - 1];
+				tail[0][i] = tail[0][i - 1];
+				tail[1][i] = tail[1][i - 1];
 			}
 		}
 		
@@ -165,11 +167,11 @@ function positioning() {
 		// Apple
 		if (x === ax) {
 			if (y === ay) {
-				ax = Math.round(Math.random() * 20) * 25;
-				ay = Math.round(Math.random() * 10) * 25;
+				ax = Math.floor(Math.random() * (20) + 1) * 25;
+				ay = Math.floor(Math.random() * (16) + 1) * 25;
 				score++;
-				tailX.push(tailX[tailX.length - 1]);
-				tailY.push(tailY[tailY.length - 1]);
+				tail[0].push(tail[0][tail[0].length - 1]);
+				tail[1].push(tail[1][tail[1].length - 1]);
 			}
 		}
 		// Off screen
@@ -186,8 +188,8 @@ function positioning() {
 		// Touching tail
 		for (let i = score; i > 0; i--) {
 			if (i > 3) {
-				if (x === tailX[i]) {
-					if (y === tailY[i]) {
+				if (x === tail[0][i]) {
+					if (y === tail[1][i]) {
 						exit = true;
 					}
 				}
@@ -198,13 +200,9 @@ function positioning() {
 
 function tick() {
 	if (pause === false) {
-		if (exit === false) {
-			positioning();
-			drawFrame();
-		} else {
-			drawGameOver();
-		}
+		positioning();
 	}
+	drawFrame();
 }
 
 //Initialise
@@ -220,8 +218,8 @@ let ay = 200;
 let score = 0;
 let exit = false;
 let pause = false;
-let tailX = [0];
-let tailY = [0];
+let tail = [[0], [0]];
+let started = false;
 
 //Game loop
 let gameloop = setInterval(function() {
