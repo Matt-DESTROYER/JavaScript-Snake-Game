@@ -26,63 +26,74 @@
 function bindKeys() {
 	document.onkeydown = function(e) {
 		e = e || window.event;
-		switch (e.keyCode) {
-				// WASD
-			case 87:
-				if (dir != 2) {
-					dir = 1;
-				}
-				break;
-			case 83:
-				if (dir != 1) {
-					dir = 2;
-				}
-				break;
-			case 65:
-				if (dir != 4) {
-					dir = 3;
-				}
-				break;
-			case 68:
-				if (dir != 3) {
-					dir = 4;
-				}
-				break;
-				
-				// ARROWS
-			case 38:
-				if (dir != 2) {
-					dir = 1;
-				}
-				break;
-			case 40:
-				if (dir != 1) {
-					dir = 2;
-				}
-				break;
-			case 37:
-				if (dir != 4) {
-					dir = 3;
-				}
-				break;
-			case 39:
-				if (dir != 3) {
-					dir = 4;
-				}
-				break;
-				
-				// RESTART
-			case 32:
-				dir = 0;
-				x = 100;
-				y = 200;
-				ax = 350;
-				ay = 200;
-				score = 0;
-				exit = false;
-				tailX = [];
-				tailY = [];
-				break;
+		if (keyPause === 0) {
+			switch (e.keyCode) {
+					// WASD
+				case 87:
+					if (dir != 2) {
+						dir = 1;
+					}
+					keyPause = 1;
+					break;
+				case 83:
+					if (dir != 1) {
+						dir = 2;
+					}
+					keyPause = 1;
+					break;
+				case 65:
+					if (dir != 4) {
+						dir = 3;
+					}
+					keyPause = 1;
+					break;
+				case 68:
+					if (dir != 3) {
+						dir = 4;
+					}
+					keyPause = 1;
+					break;
+
+					// ARROWS
+				case 38:
+					if (dir != 2) {
+						dir = 1;
+					}
+					keyPause = 1;
+					break;
+				case 40:
+					if (dir != 1) {
+						dir = 2;
+					}
+					keyPause = 1;
+					break;
+				case 37:
+					if (dir != 4) {
+						dir = 3;
+					}
+					keyPause = 1;
+					break;
+				case 39:
+					if (dir != 3) {
+						dir = 4;
+					}
+					keyPause = 1;
+					break;
+
+					// RESTART
+				case 32:
+					dir = 0;
+					x = 100;
+					y = 200;
+					ax = 350;
+					ay = 200;
+					score = 0;
+					exit = false;
+					tailX = [];
+					tailY = [];
+					keyPause = 0;
+					break;
+			}
 		}
 	}
 }
@@ -148,6 +159,9 @@ function positioning() {
 			x += 25;
 		}
 		
+		// Allow player to change direction again
+		keyPause = 0;
+		
 		// Apple
 		if (x === ax) {
 			if (y === ay) {
@@ -194,6 +208,7 @@ function tick() {
 }
 
 //Initialise
+let keyPause = 0;
 bindKeys();
 let canv = document.getElementById("game");
 let canvCtx = canv.getContext("2d");
