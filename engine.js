@@ -117,7 +117,9 @@ function drawGameOver() {
 	canvCtx.clearRect(0,0, canv.width, canv.height);
 	canvCtx.fillStyle = "black";
 	canvCtx.font = "20px Arial";
-	canvCtx.fillText("Game over! Press space to start again.", canv.width / 7, canv.height / 10);
+	canvCtx.fillText("Game over!", canv.width / 7, canv.height - 350);
+	canvCtx.fillText("Your final score was: " + score, canv.width / 7, canv.height - 300);
+	canvCtx.fillText("Press space to play again.", canv.width / 7, canv.height - 250);
 	canvCtx.closePath;
 	canvCtx.fill;
 }
