@@ -1,20 +1,24 @@
-﻿/*
+/*
 
-(Use full screen.)
-
-==================================================================
-|                     _______  _______         ___               |
-|   |\    /|    /\       |        |    |   |  |      \        /  |
-|   | \  / |   /__\      |        |    |---|  |---    \  /\  /   |
-|   |  \/  |  /    \     |        |    |   |  |___     \/  \/    |
-|                                                                |
-==================================================================
-
-All code written by Matthew Joseph James, 2020.
-
-For enquiries contact: mattdestroyerpro@gmail.com
-
-The following code runs a remake of the classic game snake.
+************************************************************************
+*                                                                      *
+* (Use full screen.)                                                   *
+*                                                                      *
+*  ==================================================================  *
+*  |                     _______  _______         ___               |  *
+*  |   |\    /|    /\       |        |    |   |  |      \        /  |  *
+*  |   | \  / |   /__\      |        |    |---|  |---    \  /\  /   |  *
+*  |   |  \/  |  /    \     |        |    |   |  |___     \/  \/    |  *
+*  |                                                                |  *
+*  ==================================================================  *
+*                                                                      *
+*  All code written by Matthew Joseph James, 2020.                     *
+*                                                                      *
+*  For enquiries contact: mattdestroyerpro@gmail.com                   *
+*                                                                      *
+*  The following code runs a remake of the classic game snake.         *
+*                                                                      *
+************************************************************************
 
 */
 
@@ -121,6 +125,16 @@ function drawGameOver() {
 // Update positioning variables and sense if off screen
 function positioning() {
 	if (exit === false) {
+		// Tail
+		tailX[0] = x;
+		tailY[0] = y;
+		if (score > 0) {
+			for (let i = score; i > 0; i--) {
+				tailX[i] = tailX[i - 1];
+				tailY[i] = tailY[i - 1];
+			}
+		}
+		
 		// Head
 		if (dir === 1) {
 			y -= 25;
@@ -130,16 +144,6 @@ function positioning() {
 			x -= 25;
 		} else if (dir === 4) {
 			x += 25;
-		}
-		
-		// Tail
-		tailX[0] = x;
-		tailY[0] = y;
-		if (score > 0) {
-			for (let i = score; i > 0; i--) {
-				tailX[i] = tailX[i - 1];
-				tailY[i] = tailY[i - 1];
-			}
 		}
 		
 		// Apple
@@ -161,6 +165,17 @@ function positioning() {
 			exit = true;
 		} else if (y > 400) {
 			exit = true;
+		}
+		
+		// Touching tail
+		for (let i = score; i > 0; i--) {
+			if (i > 3) {
+				if (x === tailX[i]) {
+					if (y === tailY[i]) {
+						exit = true;
+					}
+				}
+			}
 		}
 	}
 }
