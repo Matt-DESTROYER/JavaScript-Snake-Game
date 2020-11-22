@@ -224,4 +224,4 @@ let started = false;
 //Game loop
 let gameloop = setInterval(function() {
 	tick();
-}, 300);
+}, 150);
