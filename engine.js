@@ -20,6 +20,42 @@
 ************************************************************************
 */
 
+function setCookie(cname, cvalue, exdays) {
+	var d = new Date();
+	d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+	var expires = "expires=" + d.toUTCString();
+	document.cookie = cname + "=" + cvalue + "; " + expires + ";";
+}
+
+function changeCookie(cname, cvalue, exdays) {
+	setCookie(cname,"",-1);
+	setCookie(cname, cvalue, exdays);
+}
+
+function getCookie(cname) {
+	let name = cname + "=";
+	let ca = document.cookie.split(';');
+	for(let i = 0; i < ca.length; i++) {
+		let c = ca[i];
+		while (c.charAt(0) == ' ') {
+			c = c.substring(1);
+		}
+		if (c.indexOf(name) == 0) {
+			return c.substring(name.length, c.length);
+		}
+	}
+	return "";
+}
+
+function checkCookie() {
+	let placeholder = getCookie("high");
+	if (placeholder === "") {
+		setCookie("high", 0, 100);
+		return 0;
+	}
+	return parseInt(placeholder) + 1;
+}
+
 // Bind keys
 function bindKeys() {
 	document.onkeydown = function(e) {
@@ -29,68 +65,56 @@ function bindKeys() {
 			switch (e.keyCode) {
 				// WASD
 				case 87:
-					if (dir != 2) {
-						dir = 1;
-					}
+					if (dir != 2) dir = 1;
 					keyPause = 1;
+					if (pause === true) pause = false;
 					break;
 				case 83:
-					if (dir != 1) {
-						dir = 2;
-					}
+					if (dir != 1) dir = 2;
 					keyPause = 1;
+					if (pause === true) pause = false;
 					break;
 				case 65:
-					if (dir != 4) {
-						dir = 3;
-					}
+					if (dir != 4) dir = 3;
 					keyPause = 1;
+					if (pause === true) pause = false;
 					break;
 				case 68:
-					if (dir != 3) {
-						dir = 4;
-					}
+					if (dir != 3) dir = 4;
 					keyPause = 1;
+					if (pause === true) pause = false;
 					break;
 					// ARROWS
 				case 38:
-					if (dir != 2) {
-						dir = 1;
-					}
+					if (dir != 2) dir = 1;
 					keyPause = 1;
+					if (pause === true) pause = false;
 					break;
 				case 40:
-					if (dir != 1) {
-						dir = 2;
-					}
+					if (dir != 1) dir = 2;
 					keyPause = 1;
+					if (pause === true) pause = false;
 					break;
 				case 37:
-					if (dir != 4) {
-						dir = 3;
-					}
+					if (dir != 4) dir = 3;
 					keyPause = 1;
+					if (pause === true) pause = false;
 					break;
 				case 39:
-					if (dir != 3) {
-						dir = 4;
-					}
+					if (dir != 3) dir = 4;
 					keyPause = 1;
+					if (pause === true) pause = false;
 					break;
 					// RESTART
+				case 82:
+					setup();
+					break;
 				case 32:
-					dir = 0;
-					x = 100;
-					y = 200;
-					ax = 350;
-					ay = 200;
-					score = 0;
-					exit = false;
-					tail = [
-						[0],
-						[0]
-					];
-					keyPause = 0;
+					setup();
+					break;
+				// PAUSE
+				case 80:
+					(pause === true) ? pause = false : pause = true;
 					break;
 			}
 		}
@@ -109,94 +133,132 @@ function drawFrame() {
 	}
 	// Render apple
 	canvCtx.fillStyle = "red";
-	canvCtx.fillRect(ax, ay, 25, 25);
+	canvCtx.fillRect(ax + 1, ay + 1, 24, 24);
 	canvCtx.closePath;
 	canvCtx.fill;
 	// Render score or "game over" screen
+	canvCtx.fillStyle = "black";
+	canvCtx.font = "20px Arial";
 	if (exit === false) {
-		canvCtx.fillStyle = "black";
-		canvCtx.font = "20px Arial";
-		canvCtx.fillText("Score: " + score, 5, 20);
+		canvCtx.fillText("High score: " + high, 5, 20);
+		canvCtx.fillText("Score: " + score, 5, 45);
 		if (started === false) {
 			canvCtx.fillStyle = "black";
 			canvCtx.font = "20px Arial";
 			canvCtx.fillText("Use W, A, S, D or the arrow keys to steer.", canv.width / 7, canv.height - 275);
 			canvCtx.fillText("Press any key to begin.", canv.width / 7, canv.height - 250);
+		} else if (pause === true) {
+			canvCtx.fillText("Paused", canv.width / 2 - 35, canv.height / 2 - 30);
 		}
 	} else {
-		canvCtx.fillStyle = "black";
-		canvCtx.font = "20px Arial";
-		canvCtx.fillText("Game over!", canv.width / 7, canv.height - 300);
-		canvCtx.fillText("Your final score was: " + score, canv.width / 7, canv.height - 250);
-		canvCtx.fillText("Press space to play again.", canv.width / 7, canv.height - 200);
+		canvCtx.fillText("Game over!", 5, 20);
+		canvCtx.fillText("Your final score was: " + score, 5, 45);
+		canvCtx.fillText("Press the restart button above to restart.", 5, 70);
 	}
 }
-// Update positioning variables and sense if off screen
-function positioning() {
-	if (exit === false) {
-		// Move tail
-		tail[0][0] = x;
-		tail[1][0] = y;
-		if (score > 0) {
-			for (let i = score; i > 0; i--) {
-				tail[0][i] = tail[0][i - 1];
-				tail[1][i] = tail[1][i - 1];
+// Check if a position is on the tail
+function touchingTail(xPos, yPos) {
+	for (let i = score; i > 0; i--) {
+		if (xPos === tail[0][i]) {
+			if (yPos === tail[1][i]) {
+				return true;
 			}
 		}
-		// Head
-		if (dir === 1) {
-			y -= 25;
-		} else if (dir === 2) {
-			y += 25;
-		} else if (dir === 3) {
-			x -= 25;
-		} else if (dir === 4) {
-			x += 25;
+	}
+	return false;
+}
+// Give random apple position
+function appleRandPos() {
+	do {
+		ax = Math.floor(Math.random() * (20) + 1) * 25;
+		ay = Math.floor(Math.random() * (16) + 1) * 25;
+	} while (touchingTail(ax, ay) === true)
+}
+// Update positioning variables and sense if off screen
+function physics() {
+	// Move tail
+	if (score > 0) {
+		for (let i = score; i > 0; i--) {
+			tail[0][i] = tail[0][i - 1];
+			tail[1][i] = tail[1][i - 1];
 		}
-		// Allow player to change direction again
-		keyPause = 0;
-		// Apple
-		if (x === ax) {
-			if (y === ay) {
-				ax = Math.floor(Math.random() * (20) + 1) * 25;
-				ay = Math.floor(Math.random() * (16) + 1) * 25;
-				score++;
+		tail[0][0] = x;
+		tail[1][0] = y;
+	}
+	// Head
+	if (score === 0) {
+		var x2 = x;
+		var y2 = y;
+	}
+	if (dir === 1) {
+		y -= 25;
+	} else if (dir === 2) {
+		y += 25;
+	} else if (dir === 3) {
+		x -= 25;
+	} else if (dir === 4) {
+		x += 25;
+	}
+	// Allow player to change direction again
+	keyPause = 0;
+	// Apple
+	if (x === ax) {
+		if (y === ay) {
+			appleRandPos();
+			score++;
+			if (score > high) {
+				high = score;
+			}
+			if (score === 1) {
+				tail[0][0] = x2;
+				tail[1][0] = y2;
+			} else {
 				tail[0].push(tail[0][tail[0].length - 1]);
 				tail[1].push(tail[1][tail[1].length - 1]);
 			}
 		}
-		// Off screen
-		if (x < 0) {
-			exit = true;
-		} else if (x > 500) {
-			exit = true;
-		} else if (y < 0) {
-			exit = true;
-		} else if (y > 400) {
-			exit = true;
-		}
-		// Touching tail
-		for (let i = score; i > 0; i--) {
-			if (i > 3) {
-				if (x === tail[0][i]) {
-					if (y === tail[1][i]) {
-						exit = true;
-					}
-				}
-			}
-		}
 	}
+	// Off screen
+	if (x < 0) {
+		exit = true;
+	} else if (x > 500) {
+		exit = true;
+	}
+	if (y < 0) {
+		exit = true;
+	} else if (y > 400) {
+		exit = true;
+	}
+	// Check if head is touching tail
+	if (touchingTail(x, y)) exit = true;
 }
 
 function tick() {
-	if (pause === false) {
-		positioning();
+	if (pause === false && exit ===  false) {
+		physics();
 	}
 	drawFrame();
 }
+
+function setup() {
+	keyPause = 0;
+	dir = 0;
+	x = 100;
+	y = 200;
+	ax = 350;
+	ay = 200;
+	score = 0;
+	exit = false;
+	pause = false;
+	tail = [
+		[0],
+		[0]
+	];
+	started = false;
+}
+
 //Initialise
 let keyPause = 0;
-bindKeys();
 let canv = document.getElementById("game");
 let canvCtx = canv.getContext("2d");
 let dir = 0;
@@ -212,7 +274,9 @@ let tail = [
 	[0]
 ];
 let started = false;
+let high = 0;
+bindKeys();
 //Game loop
 let gameloop = setInterval(function() {
 	tick();
-}, 150);
+}, 175);
