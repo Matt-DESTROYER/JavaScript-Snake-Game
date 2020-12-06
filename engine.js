@@ -107,10 +107,10 @@ function bindKeys() {
 					break;
 					// RESTART
 				case 82:
-					setup();
+					reset();
 					break;
 				case 32:
-					setup();
+					reset();
 					break;
 				// PAUSE
 				case 80:
@@ -240,7 +240,7 @@ function tick() {
 	drawFrame();
 }
 
-function setup() {
+function reset() {
 	keyPause = 0;
 	dir = 0;
 	x = 100;
