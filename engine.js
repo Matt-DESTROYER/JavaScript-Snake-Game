@@ -167,7 +167,7 @@ function touchingTail(xPos, yPos) {
 	}
 	return false;
 }
-// Give random apple position
+// Set random apple position
 function appleRandPos() {
 	do {
 		ax = Math.floor(Math.random() * (20) + 1) * 25;
@@ -208,6 +208,7 @@ function physics() {
 			score++;
 			if (score > high) {
 				high = score;
+				setCookie("high", high, 100);
 			}
 			if (score === 1) {
 				tail[0][0] = x2;
@@ -274,7 +275,7 @@ let tail = [
 	[0]
 ];
 let started = false;
-let high = 0;
+let high = checkCookie();
 bindKeys();
 //Game loop
 let gameloop = setInterval(function() {
