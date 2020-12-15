@@ -67,43 +67,36 @@ function bindKeys() {
 				case 87:
 					if (dir != 2) dir = 1;
 					keyPause = 1;
-					if (pause === true) pause = false;
 					break;
 				case 83:
 					if (dir != 1) dir = 2;
 					keyPause = 1;
-					if (pause === true) pause = false;
 					break;
 				case 65:
 					if (dir != 4) dir = 3;
 					keyPause = 1;
-					if (pause === true) pause = false;
 					break;
 				case 68:
 					if (dir != 3) dir = 4;
 					keyPause = 1;
-					if (pause === true) pause = false;
 					break;
 					// ARROWS
 				case 38:
 					if (dir != 2) dir = 1;
 					keyPause = 1;
-					if (pause === true) pause = false;
 					break;
 				case 40:
 					if (dir != 1) dir = 2;
 					keyPause = 1;
-					if (pause === true) pause = false;
 					break;
 				case 37:
 					if (dir != 4) dir = 3;
 					keyPause = 1;
-					if (pause === true) pause = false;
+					
 					break;
 				case 39:
 					if (dir != 3) dir = 4;
 					keyPause = 1;
-					if (pause === true) pause = false;
 					break;
 					// RESTART
 				case 82:
@@ -117,6 +110,7 @@ function bindKeys() {
 					(pause === true) ? pause = false : pause = true;
 					break;
 			}
+			if (pause === true) pause = false;
 		}
 	}
 }
@@ -151,9 +145,9 @@ function drawFrame() {
 			canvCtx.fillText("Paused", canv.width / 2 - 35, canv.height / 2 - 30);
 		}
 	} else {
-		canvCtx.fillText("Game over!", 5, 20);
-		canvCtx.fillText("Your final score was: " + score, 5, 45);
-		canvCtx.fillText("Press the restart button above to restart.", 5, 70);
+		canvCtx.fillText("Game over!", 200, 100);
+		canvCtx.fillText("Your final score was: " + score, 160, 150);
+		canvCtx.fillText("Press the restart button above to restart.", 90, 200);
 	}
 }
 // Check if a position is on the tail
@@ -187,8 +181,8 @@ function physics() {
 	}
 	// Head
 	if (score === 0) {
-		var x2 = x;
-		var y2 = y;
+		x2 = x;
+		y2 = y;
 	}
 	if (dir === 1) {
 		y -= 25;
@@ -265,6 +259,8 @@ let canvCtx = canv.getContext("2d");
 let dir = 0;
 let x = 100;
 let y = 200;
+let x2;
+let y2;
 let ax = 350;
 let ay = 200;
 let score = 0;
