@@ -53,7 +53,7 @@ function checkCookie() {
 		setCookie("high", 0, 100);
 		return 0;
 	}
-	return parseInt(placeholder) + 1;
+	return parseInt(placeholder);
 }
 
 // Bind keys
